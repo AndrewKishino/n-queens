@@ -14,133 +14,51 @@
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
 window.findNRooksSolution = function(n) {
-  var solution;
-  //set up a blank board with nxn dimensions
+  //set up a blank board
   var board = new Board({n:n});
-  //set up a counter 
-  var counter = 1;
-  //set up last piece position
-  var pos = [0,0];
-  //set a piece at 0,0 on the board
-  board.togglePiece(pos[0],pos[1]);
-  //set up a recursive function that takes in a board
-  var checkBoard = function(board) {
-    //check if the matrix has any conflicts
-    //if there are conflicts
-    if(board.hasAnyRooksConflicts()) {
-      board.togglePiece(pos[0],pos[1]);
-      //move the bottom-right most piece, one space ahead
-      pos = moveForward(pos, n);
-      board.togglePiece(pos[0], pos[1]);
-      //call the function again
-      return checkBoard(board);
+  var row = 0, col = 0; 
+  //place a piece at (0,0);
+  board.togglePiece(row, col);
+  var pieces = 1;
+
+  //recursive function
+  var verifyBoard = function(board) {
+    var anyConflicts = board.hasAnyRooksConflicts();
+    if (!anyConflicts && pieces === n) {
+      //board is a solution
+      return board.rows();
+    } else if (!anyConflicts) {
+      //board has no conflicts, but needs more pieces, add a piece on the next row
+      row++;
+      col = 0;
+      board.togglePiece(row, col);
+      pieces++;
+      return verifyBoard(board);
     } else {
-      //if there are not conflicts, checks the amount of pieces on board = n
-      if(counter === n) {
-        solution = board.rows();
-        console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-        return solution;
-      } else {
-        counter++;
-        pos = moveForward(pos, n);
-        board.togglePiece(pos[0], pos[1]);
-        return checkBoard(board);
-      }
+      //board has conflicts, move the piece on the bottom most row over one space
+      board.togglePiece(row, col++);
+      board.togglePiece(row, col);
+      return verifyBoard(board);
     }
-      //if true, solution = board.rows()
   }
-  return checkBoard(board);
+  return verifyBoard(board);
 };
-
-window.moveForward = function(pos, n) {
-  if(pos[1] === n-1) {
-    if(pos[0] < n-1) {
-      pos[0]++;
-      pos[1] = 0;
-    } else {
-      return false;
-    }
-  } else {
-    pos[1]++;
-  }
-  return pos;
-};
-
-window.moveForwardAndLoop = function(pos, n) {
-  if(pos[1] === n-1) {
-    if(pos[0] < n-1) {
-      pos[0]++;
-      pos[1] = 0;
-    } else {
-      pos[0] = 0;
-      pos[1] = 0;
-    }
-  } else {
-    pos[1]++;
-  }
-  return pos;
-};
-
-
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
     
-    var solutionCount = 0;
     var solutions = [];
 
-    var checkBoardWithStartingPos = function(n, pos) {
-      //set up a blank board with nxn dimensions
-      var board = new Board({n:n});
-      //set up a counter 
-      var counter = 1;
-      //set a piece at 0,0 on the board
-      board.togglePiece(pos[0],pos[1]);
-      //set up a recursive function that takes in a board
-      var checkBoard = function(board) {
-        //check if the matrix has any conflicts
-        //if there are conflicts
-        if(board.hasAnyRooksConflicts()) {
-          board.togglePiece(pos[0],pos[1]);
-          //move the bottom-right most piece, one space ahead
-          pos = moveForwardAndLoop(pos, n);
-          board.togglePiece(pos[0], pos[1]);
-          //call the function again
-          return checkBoard(board);
-        } else {
-          //if there are not conflicts, checks the amount of pieces on board = n
-          if(counter === n) {
-            if(_.contains(solutions, board.rows().toString())){
-              return;
-            } else {
-              solutions.push(board.rows().toString());
-              solutionCount++;
-              return;
-            }
-          } else {
-            counter++;
-            pos = moveForwardAndLoop(pos, n);
-            board.togglePiece(pos[0], pos[1]);
-            return checkBoard(board);
-          }
-        }
-      }
+    var verifyBoard = function(board) {
+      board.togglePiece(0, col);
 
-      return checkBoard(board);
-
-    }
-
-    for (var r = 0; r < n; r++) {
-      for (var c = 0; c < n; c++){
-        var startingPos = [r, c];
-        checkBoardWithStartingPos(n, startingPos);
-      }
     };
 
-    console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-
-  return solutionCount;
-
+    //start the decision with a piece at each poisiton in the first row
+    for (var col = 0; col < n; col++) {
+      var board = 
+      verifyBoard(board);
+    }
 };
 
 
