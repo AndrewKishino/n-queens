@@ -64,16 +64,83 @@ window.moveForward = function(pos, n) {
     pos[1]++;
   }
   return pos;
-}
+};
+
+window.moveForwardAndLoop = function(pos, n) {
+  if(pos[1] === n-1) {
+    if(pos[0] < n-1) {
+      pos[0]++;
+      pos[1] = 0;
+    } else {
+      pos[0] = 0;
+      pos[1] = 0;
+    }
+  } else {
+    pos[1]++;
+  }
+  return pos;
+};
 
 
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+    
+    var solutionCount = 0;
+    var solutions = [];
 
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+    var checkBoardWithStartingPos = function(n, pos) {
+      //set up a blank board with nxn dimensions
+      var board = new Board({n:n});
+      //set up a counter 
+      var counter = 1;
+      //set a piece at 0,0 on the board
+      board.togglePiece(pos[0],pos[1]);
+      //set up a recursive function that takes in a board
+      var checkBoard = function(board) {
+        //check if the matrix has any conflicts
+        //if there are conflicts
+        if(board.hasAnyRooksConflicts()) {
+          board.togglePiece(pos[0],pos[1]);
+          //move the bottom-right most piece, one space ahead
+          pos = moveForwardAndLoop(pos, n);
+          board.togglePiece(pos[0], pos[1]);
+          //call the function again
+          return checkBoard(board);
+        } else {
+          //if there are not conflicts, checks the amount of pieces on board = n
+          if(counter === n) {
+            if(_.contains(solutions, board.rows().toString())){
+              return;
+            } else {
+              solutions.push(board.rows().toString());
+              solutionCount++;
+              return;
+            }
+          } else {
+            counter++;
+            pos = moveForwardAndLoop(pos, n);
+            board.togglePiece(pos[0], pos[1]);
+            return checkBoard(board);
+          }
+        }
+      }
+
+      return checkBoard(board);
+
+    }
+
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++){
+        var startingPos = [r, c];
+        checkBoardWithStartingPos(n, startingPos);
+      }
+    };
+
+    console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+
   return solutionCount;
+
 };
 
 
