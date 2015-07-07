@@ -44,21 +44,32 @@ window.findNRooksSolution = function(n) {
   return verifyBoard(board);
 };
 
+
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-    
-    var solutions = [];
+  var solutions = [];
 
-    var verifyBoard = function(board) {
-      board.togglePiece(0, col);
-
-    };
-
-    //start the decision with a piece at each poisiton in the first row
-    for (var col = 0; col < n; col++) {
-      var board = 
-      verifyBoard(board);
+  var findNRooksSolutionAt = function(matrix, row, n) {
+    //create a new board
+    var board = new Board(matrix);
+    if(row === n && !board.hasAnyRooksConflicts()) {
+      //if the board is full and has no conflicts
+      var matrixArray = [];
+      matrixArray[0] = matrix.toString(); 
+      solutions.push(matrixArray);
+      debugger;
+      return;
     }
+    for(var i = 0; i < n; i++) {
+      board.togglePiece(row, i);
+      if(!board.hasAnyRooksConflicts()) {
+        findNRooksSolutionAt(board.rows(), row + 1, n);
+      }
+      board.togglePiece(row, i);
+    }
+  };
+  findNRooksSolutionAt({n:n}, 0, n);
+  return solutions.length;
 };
 
 
