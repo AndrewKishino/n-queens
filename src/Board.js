@@ -29,6 +29,22 @@
       this.trigger('change');
     },
 
+    print: function() {
+      var string = "";
+      _.each(this.rows(), function(row){
+        string += row.toString() + "\n";
+      });
+      console.log(string);
+    },
+
+    pieces: function() {
+      return _.reduce(this.rows(), function(memo, row) {
+          return memo + _.reduce(row, function(memo, col) {
+            return memo + col;
+          }, 0);
+        }, 0);
+    },
+
     _getFirstRowColumnIndexForMajorDiagonalOn: function(rowIndex, colIndex) {
       return colIndex - rowIndex;
     },

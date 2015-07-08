@@ -57,7 +57,6 @@ window.countNRooksSolutions = function(n) {
       var matrixArray = [];
       matrixArray[0] = matrix.toString(); 
       solutions.push(matrixArray);
-      debugger;
       return;
     }
     for(var i = 0; i < n; i++) {
@@ -69,17 +68,65 @@ window.countNRooksSolutions = function(n) {
     }
   };
   findNRooksSolutionAt({n:n}, 0, n);
+  console.log('Number of solutions for ' + n + ' rooks: ' + solutions.length)
   return solutions.length;
+
 };
 
 
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  if (n === 0) {
+    return 0;
+  }
+  var solutions = [];
+  
+  var recursive = function(matrix, row, n) {
+    //create a new board
+    var board = new Board(matrix);
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+    //base case: if row === n && board has no conflicts
+    if (row === n && !board.hasAnyQueensConflicts()) {
+      //board is a solution! 
+      console.log("THIS IS THE SOLUTION!!");
+      console.log(board.print());
+      return board.rows();
+    }
+
+    //recursive case
+    for (var i = 0; i < n; i++) {
+      //toggle piece on
+      board.togglePiece(row, i);
+
+      //check the new board to see if it has any conflicts
+      if (board.hasAnyQueensConflicts()) {
+        //board has conflicts, don't check any children
+        console.log("Board has conflicts, don't check any children");
+        console.log(board.print());
+        board.togglePiece(row, i);
+
+      } else if (!board.hasAnyQueensConflicts() && board.pieces() !== n) {
+        //there are no conflicts, but more pieces are needed
+        console.log("No conflicts, but need more pieces");
+        console.log(board.print());
+        //call the recursive function on the next row
+        recursive(board.rows(), row + 1, n);
+        //toggle the piece off
+        board.togglePiece(row, i);
+   
+      } else if (!board.hasAnyQueensConflicts() && board.pieces() === n) {
+        //we have a solution! 
+        console.log("This is a solution!!!");
+        console.log(board.print());
+        //push the solution
+        solutions.push(board.rows());
+        
+      }
+    }
+  }
+
+  return recursive({n:n}, 0, n);
 };
 
 
